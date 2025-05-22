@@ -67,18 +67,32 @@ def format_time(seconds):
         return f"{seconds}秒"
 
 
-def countdown(seconds, message):
-    """倒计时"""
+def countdown(seconds, message, play_end_sound=True):
+    """倒计时
+    
+    参数：
+        seconds: 倒计时秒数
+        message: 显示的消息
+        play_end_sound: 是否在结束时播放提示音
+    """
     for i in range(seconds, 0, -1):
         sys.stdout.write(f"\r{message}：{format_time(i)}  ")
         sys.stdout.flush()
         time.sleep(1)
     sys.stdout.write("\r" + " " * 50 + "\r")
     sys.stdout.flush()
+    
+    # 倒计时结束时播放提示音
+    if play_end_sound:
+        play_sound_if_available(end_sound=True)
 
 
-def play_sound_if_available():
-    """播放提示音（如果有）"""
+def play_sound_if_available(end_sound=False):
+    """播放提示音（如果有）
+    
+    参数：
+        end_sound: 是否为结束提示音（使用不同的提示音或音调）
+    """
     if HAS_SOUND:
         sound_file = get_random_sound()
         if sound_file:
@@ -86,9 +100,17 @@ def play_sound_if_available():
                 winsound.PlaySound(sound_file, winsound.SND_FILENAME)
             except Exception as e:
                 print(f"播放音频文件失败：{e}")
-                winsound.Beep(800, 500)
+                # 根据是否为结束提示音使用不同的音调
+                if end_sound:
+                    winsound.Beep(1000, 500)  # 较高音调（1000Hz，持续500毫秒）
+                else:
+                    winsound.Beep(800, 500)   # 正常音调（800Hz，持续500毫秒）
         else:
-            winsound.Beep(800, 500)
+            # 根据是否为结束提示音使用不同的音调
+            if end_sound:
+                winsound.Beep(1000, 500)  # 较高音调（1000Hz，持续500毫秒）
+            else:
+                winsound.Beep(800, 500)   # 正常音调（800Hz，持续500毫秒）
             print("提示：未找到音频文件")
     else:
         print("\a")
@@ -101,6 +123,7 @@ def main():
     print("专注时间管理助手已启动")
     print(f"- 每隔 {MIN_REMINDER_INTERVAL}~{MAX_REMINDER_INTERVAL} 分钟提醒休息 {SHORT_BREAK_PERIOD} 秒")
     print(f"- 每完成 {FOCUS_PERIOD} 分钟专注，休息 {LONG_BREAK_PERIOD} 分钟")
+    print("- 休息结束时会播放提示音")
     print("=" * 50)
     
     # 检查声音文件
@@ -139,8 +162,8 @@ def main():
                 # 短休息提醒
                 play_sound_if_available()
                 print(f"\n[{datetime.datetime.now().strftime('%H:%M:%S')}] 请短暂休息 {SHORT_BREAK_PERIOD} 秒")
-                countdown(SHORT_BREAK_PERIOD, "休息时间")
-                print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] 继续专注！")
+                countdown(SHORT_BREAK_PERIOD, "休息时间", play_end_sound=True)  # 启用结束提示音
+                print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] 休息结束，继续专注！")
                 
                 # 设置下一次提醒时间
                 next_reminder_time = get_random_interval()
@@ -155,7 +178,8 @@ def main():
             # 长休息提醒
             play_sound_if_available()
             print(f"\n[{datetime.datetime.now().strftime('%H:%M:%S')}] 请休息 {LONG_BREAK_PERIOD} 分钟")
-            countdown(LONG_BREAK_PERIOD * 60, "长休息时间")
+            countdown(LONG_BREAK_PERIOD * 60, "长休息时间", play_end_sound=True)  # 启用结束提示音
+            play_sound_if_available(end_sound=True)  # 额外再播放一次结束提示音
             print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] 休息结束，准备下一个专注周期")
             time.sleep(3)  # 给用户一点准备时间
             
