@@ -1,0 +1,9 @@
+[project]
+name = "regularreminderassistant"
+version = "0.1.0"
+description = "定时提醒休息的专注时间管理助手"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pyinstaller>=6.13.0",
+]
