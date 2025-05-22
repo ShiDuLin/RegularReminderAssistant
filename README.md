@@ -12,7 +12,7 @@
 
 ### 方法一：直接运行可执行文件（推荐）
 
-1. 在 `dist` 文件夹中找到已打包好的可执行文件 `ReminderAssistent.exe`
+1. 在根目录中找到已打包好的可执行文件 `ReminderAssistent.exe`
 2. 双击运行该文件即可启动程序，无需安装Python环境
 
 ### 方法二：通过Python运行
